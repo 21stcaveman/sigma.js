@@ -12,29 +12,23 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edgehovers.arrow =
+  sigma.canvas.edgehovers.parallel =
     function(edge, source, target, context, settings) {
-    var color = edge.color,
+      var color = edge.color,
         prefix = settings('prefix') || '',
-        edgeColor = settings('edgeColor'),
-        defaultNodeColor = settings('defaultNodeColor'),
-        defaultEdgeColor = settings('defaultEdgeColor'),
-        mirror = !!edge['mirror'],
         size = edge[prefix + 'size'] || 1,
-        tSize = target[prefix + 'size'],
+        count = edge.count || 0,
+        edgeColor = settings('edgeColor'),
+        cp = {},
+        sSize = source[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
         tX = target[prefix + 'x'],
-        tY = target[prefix + 'y'];
+        tY = target[prefix + 'y'],
+        defaultNodeColor = settings('defaultNodeColor'),
+        defaultEdgeColor = settings('defaultEdgeColor');
 
-    size = (edge.hover) ?	
-      settings('edgeHoverSizeRatio') * size : size;
-    var aSize = size * 2.5,
-        d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2)),
-        aX = sX + (tX - sX) * (d - aSize - tSize) / d,
-        aY = sY + (tY - sY) * (d - aSize - tSize) / d,
-        vX = (tX - sX) * aSize / d,
-        vY = (tY - sY) * aSize / d;
+    cp = sigma.utils.getParallelControlPoint(sX, sY, tX, tY, count)
 
     if (!color)
       switch (edgeColor) {
@@ -54,24 +48,13 @@
     } else {
       color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
     }
+    size *= settings('edgeHoverSizeRatio');
 
     context.strokeStyle = color;
     context.lineWidth = size;
     context.beginPath();
     context.moveTo(sX, sY);
-    context.lineTo(
-      aX,
-      aY
-    );
+    if (count == 0) context.lineTo(tX, tY); else context.quadraticCurveTo(cp.x, cp.y, tX, tY);
     context.stroke();
-
-    context.fillStyle = color;
-    context.beginPath();
-    context.moveTo(aX + vX, aY + vY);
-    context.lineTo(aX + vY * 0.6, aY - vX * 0.6);
-    context.lineTo(aX - vY * 0.6, aY + vX * 0.6);
-    context.lineTo(aX + vX, aY + vY);
-    context.closePath();
-    context.fill();
   };
 })();
