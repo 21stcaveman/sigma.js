@@ -19,7 +19,6 @@
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
-        mirror = !!edge['mirror'],
         size = edge[prefix + 'size'] || 1,
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
@@ -27,7 +26,7 @@
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'];
 
-    size = (edge.hover) ?	
+    size = (edge.hover) ?
       settings('edgeHoverSizeRatio') * size : size;
     var aSize = size * 2.5,
         d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2)),
