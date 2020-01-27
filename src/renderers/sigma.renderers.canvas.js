@@ -32,6 +32,7 @@
         l,
         a,
         fn,
+        bg,
         self = this;
 
     sigma.classes.dispatcher.extend(this);
@@ -114,6 +115,8 @@
   sigma.renderers.canvas.prototype.render = function(options) {
     options = options || {};
 
+    this.dispatchEvent('beforeRender');
+
     var a,
         i,
         k,
@@ -128,6 +131,8 @@
         rendererType,
         batchSize,
         tempGCO,
+        bg = this.settings(options, 'backgroundImage'),
+        fixedBg = this.settings(options, 'fixedBackground') || sigma.settings.fixedBackground,
         index = {},
         graph = this.graph,
         nodes = this.graph.nodes,
@@ -174,6 +179,19 @@
 
     for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
       index[a[i].id] = a[i];
+
+    if (bg != undefined) {
+      if (fixedBg)
+        this.contexts.scene.drawImage(bg, 0, 0, this.width, this.height);
+      else {
+        var newWidth = this.width / this.camera.ratio,
+        newHeight = this.height / this.camera.ratio,
+        c = this.camera.graphPosition(0,0),
+        X = newWidth * (this.camera.ratio - 1),
+        Y = newHeight * (this.camera.ratio - 1);
+        this.contexts.scene.drawImage(bg, c.x + X/2, c.y + Y/2, newWidth, newHeight);
+      }
+    }
 
     // Draw edges:
     // - If settings('batchEdgesDrawing') is true, the edges are displayed per
